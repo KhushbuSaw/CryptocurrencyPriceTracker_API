@@ -82,7 +82,7 @@ namespace CryptocurrencyPriceTracker_API.Controllers
             });
         }
         [HttpPost("send-reset-email/{email}")]
-        public async Task<IActionResult> SendMail(string email)
+        public async Task<IActionResult> SendMail([FromRoute] string email)
         {
             var user =await _userDetailsManager.GetUserDetailUsingEmail(email);
             if (user is null)
@@ -104,7 +104,7 @@ namespace CryptocurrencyPriceTracker_API.Controllers
             }
         }
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordModel model)
         {
             var newToken = model.EmailToken.Replace(" ", "+");
             var user = await _userDetailsManager.GetUserDetailUsingEmail(model.Email);
