@@ -23,6 +23,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ApplicationContext>(options =>
           options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUserDetailsManager, UserDetailsManager>();
+builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddTransient<IUserDetailsRepository, UserDetailsRepository>();
 builder.Services.AddCors(options =>
 options.AddPolicy("MyPolicy", builder =>

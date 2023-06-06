@@ -14,5 +14,7 @@ namespace CryptocurrencyPriceTracker_API.Repositories
         public Task<bool> CheckUserNameExist(string userName);
         public Task<bool> CheckEmailExist(string email);
         public Task<IEnumerable<UserDetailEntity>> GetUserDetailsList();
+        public Task<UserDetailEntity> GetUserDetailUsingEmail(string email);
+        public void UpdateUserPassword(UserDetailEntity entity);
     }
 }
