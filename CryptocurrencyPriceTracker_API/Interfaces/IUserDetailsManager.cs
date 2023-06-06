@@ -18,5 +18,8 @@ namespace CryptocurrencyPriceTracker_API.Interfaces
         public Task<UserDetailEntity> GetUserDetail(string username);
         public string CreateRefreshToken();
         public string CreateJwt(UserDetailEntity user);
+        public Task<UserDetailEntity> GetUserDetailUsingEmail(string email);
+        public Task<UserDetailEntity> UpdateUserPassword(UserDetailEntity entity, string email);
+        public Task<UserDetailEntity> ResetUserPassword(ResetPasswordModel model, UserDetailEntity entity);
     }
 }

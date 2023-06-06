@@ -42,5 +42,15 @@ namespace CryptocurrencyPriceTracker_API.Repositories
         {
             return await _dbContext.UserDetails.Where(x => x.UserName == username).FirstOrDefaultAsync();
         }
+
+        public async Task<UserDetailEntity> GetUserDetailUsingEmail(string email)
+        {
+            return await _dbContext.UserDetails.Where(x => x.Email== email).FirstOrDefaultAsync();
+        }
+
+        public void UpdateUserPassword(UserDetailEntity entity)
+        {
+            _dbContext.UserDetails.Update(entity);
+        }
     }
 }

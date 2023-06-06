@@ -19,9 +19,13 @@ namespace CryptocurrencyPriceTracker_API.Managers
     public class UserDetailsManager:IUserDetailsManager
     {
         private readonly IUserDetailsRepository _userDetailsRepository;
-        public UserDetailsManager(IUserDetailsRepository userDetailsRepository)
+        private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
+        public UserDetailsManager(IUserDetailsRepository userDetailsRepository, IConfiguration configuration, IEmailService emailService)
         {
             _userDetailsRepository = userDetailsRepository;
+            _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<TokenDtoModel> AuthenticateUser(UserDetailModel model)
@@ -137,6 +141,37 @@ namespace CryptocurrencyPriceTracker_API.Managers
         public async Task<UserDetailEntity> GetUserDetail(string username)
         {
             return await _userDetailsRepository.GetUserDetail(username);
+        }
+
+        public async Task<UserDetailEntity> GetUserDetailUsingEmail(string email)
+        {
+            var entity = await _userDetailsRepository.GetUserDetailUsingEmail(email);
+            if (entity == null)
+                return null;
+            else
+            {
+                return entity;
+            }
+        }
+        public async Task<UserDetailEntity> UpdateUserPassword(UserDetailEntity entity, string email)
+        {
+            var tokenBytes = RandomNumberGenerator.GetBytes(64);
+            var emailToken = Convert.ToBase64String(tokenBytes);
+            entity.ResetPasswordToken = emailToken;
+            entity.ResetPasswordExpiry = DateTime.Now.AddMinutes(15);
+            string from = _configuration["EmailSettings:From"];
+            var emailModel = new EmailModel(email, "Reset Password!!", EmailBody.EmailStringBody(email, emailToken));
+            _emailService.SendEmail(emailModel);
+            _userDetailsRepository.UpdateUserPassword(entity);
+            await _userDetailsRepository.SaveChangesAsync();
+            return entity;
+        }
+        public async Task<UserDetailEntity> ResetUserPassword(ResetPasswordModel model, UserDetailEntity entity)
+        {
+            entity.Password = PasswordHasher.HashPassword(model.NewPassword);
+            _userDetailsRepository.UpdateUserPassword(entity);
+            await _userDetailsRepository.SaveChangesAsync();
+            return entity;
         }
     }
 }

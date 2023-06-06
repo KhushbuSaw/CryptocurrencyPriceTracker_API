@@ -1,10 +1,12 @@
-﻿using CryptocurrencyPriceTracker_API.Interfaces;
+﻿using CryptocurrencyPriceTracker_API.Entity;
+using CryptocurrencyPriceTracker_API.Interfaces;
 using CryptocurrencyPriceTracker_API.Model.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace CryptocurrencyPriceTracker_API.Controllers
@@ -36,7 +38,7 @@ namespace CryptocurrencyPriceTracker_API.Controllers
             }
             catch (Exception ex)
             {
-               return BadRequest(new { Message = ex.Message });
+                return BadRequest(new { Message = ex.Message });
             }
         }
         [HttpPost("register")]
@@ -50,10 +52,10 @@ namespace CryptocurrencyPriceTracker_API.Controllers
                 await _userDetailsManager.RegisterUser(model);
                 return Ok(new { Message = "User Register!" });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
-            }          
+            }
         }
         [Authorize]
         [HttpGet]
@@ -70,15 +72,68 @@ namespace CryptocurrencyPriceTracker_API.Controllers
             string refreshToken = tokenDto.RefreshToken;
             var principle = _userDetailsManager.GetPrincipalFromExpiredToken(accessToken);
             string username = principle.Identity.Name;
-            var userDetail= await _userDetailsManager.GetUserDetail(username);
-            if(userDetail is null)
+            var userDetail = await _userDetailsManager.GetUserDetail(username);
+            if (userDetail is null)
                 return BadRequest("Invalid Request");
             return Ok(new TokenDtoModel
             {
                 AccessToken = _userDetailsManager.CreateJwt(userDetail),
                 RefreshToken = _userDetailsManager.CreateRefreshToken()
             });
-
         }
+        [HttpPost("send-reset-email/{email}")]
+        public async Task<IActionResult> SendMail(string email)
+        {
+            var user =await _userDetailsManager.GetUserDetailUsingEmail(email);
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = 400,
+                    Message = "Email Doesn't Exist"
+                });
+            }
+            else
+            {
+               await _userDetailsManager.UpdateUserPassword(user,email);
+                return Ok(new
+                {
+                    StatusCode = 200,
+                    Message = "Email Sent!"
+                });
+            }
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            var newToken = model.EmailToken.Replace(" ", "+");
+            var user = await _userDetailsManager.GetUserDetailUsingEmail(model.Email);
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = 400,
+                    Message = "User Doesn't Exist"
+                });
+            }
+            var tokenCode = user.ResetPasswordToken;
+            DateTime emailTokenExpiry = user.ResetPasswordExpiry;
+            if(tokenCode!=model.EmailToken||emailTokenExpiry<DateTime.Now)
+            {
+                return BadRequest(new
+                {
+                    StatusCode=400,
+                    Messaage="Invalid Reset Link"
+                });
+            }
+            await _userDetailsManager.ResetUserPassword(model,user);
+            return Ok(new
+            {
+                StatusCode = 200,
+                Message = "Email Sent!"
+            });
+        }
+
+
     }
 }
