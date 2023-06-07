@@ -95,7 +95,7 @@ namespace CryptocurrencyPriceTracker_API.Controllers
             }
             else
             {
-               await _userDetailsManager.UpdateUserPassword(user,email);
+               await _userDetailsManager.SetResetPasswordToken(user,email);
                 return Ok(new
                 {
                     StatusCode = 200,
@@ -103,7 +103,7 @@ namespace CryptocurrencyPriceTracker_API.Controllers
                 });
             }
         }
-        [HttpPost("reset-password")]
+        [HttpPost("resetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordModel model)
         {
             var newToken = model.EmailToken.Replace(" ", "+");

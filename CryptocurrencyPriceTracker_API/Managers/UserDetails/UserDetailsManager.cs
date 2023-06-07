@@ -153,7 +153,7 @@ namespace CryptocurrencyPriceTracker_API.Managers
                 return entity;
             }
         }
-        public async Task<UserDetailEntity> UpdateUserPassword(UserDetailEntity entity, string email)
+        public async Task<UserDetailEntity> SetResetPasswordToken(UserDetailEntity entity, string email)
         {
             var tokenBytes = RandomNumberGenerator.GetBytes(64);
             var emailToken = Convert.ToBase64String(tokenBytes);
