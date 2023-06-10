@@ -20,7 +20,7 @@ namespace CryptocurrencyPriceTracker_API.Managers
                 Password=model.Password,
                 Email=model.Email,
                 Role=model.Role,   
-                PhoneNumber="9999999999"
+                PhoneNumber=model.PhoneNumber
             };
             return entity;
         }
@@ -34,6 +34,7 @@ namespace CryptocurrencyPriceTracker_API.Managers
                 Password = entity.Password,
                 Email = entity.Email,
                 Role = entity.Role,
+                PhoneNumber=entity.PhoneNumber
             };
         }
     }
