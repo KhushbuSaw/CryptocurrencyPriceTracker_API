@@ -34,6 +34,7 @@ namespace CryptocurrencyPriceTracker_API.Managers
                 Password = entity.Password,
                 Email = entity.Email,
                 Role = entity.Role,
+                PhoneNumber=entity.PhoneNumber
             };
         }
     }
