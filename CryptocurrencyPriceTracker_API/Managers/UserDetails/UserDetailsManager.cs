@@ -89,7 +89,7 @@ namespace CryptocurrencyPriceTracker_API.Managers
             var identity = new ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.Role,role),
-                new Claim(ClaimTypes.Name,$"{user.UserName}")
+                new Claim(ClaimTypes.Name,$"{user.FirstName+" "+user.LastName}")
             });
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
 
